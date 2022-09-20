@@ -116,6 +116,10 @@ then calling \texttt{calculate\_sizes(T.root)} should modify  \treeT\ to be the 
 
  Your program should run in time $O(n)$ when given the root of a tree with $n$ vertices. In a sentence or two, informally justify why your program has such a runtime. 
  
+ \begin{proof}[Solution]
+In the program, each node is touched at most three times - once when approaching from the parent, and once from each child. Also, every node must be touched at most once so that we can perform the basic operation of adding its child nodes' sizes. Therefore we perform a basic operation at least once and at most three times for every node; the runtime is $O(n)$.
+ \end{proof}
+ 
  \item (proofs by contradiction) \label{part:contradiction}
  Removing a vertex \btv\ from a tree \treeT\ yields up to three disjoint trees: the subtree rooted at
  \texttt{v.left} (unless \texttt{v.left==None}), the subtree rooted at
@@ -134,8 +138,23 @@ then calling \texttt{calculate\_sizes(T.root)} should modify  \treeT\ to be the 
   Prove that in every tree \treeT\ of size $n$, there exists a vertex \btv\ such that removing \btv\ from \treeT\ results in disjoint trees that all have size at most $n/2$.  \\
   
   You may prove this however you like, but a recommended approach is to define a ``potential function'' $\phi$ on the vertices of the tree, by setting $\phi(\btv)$ to equal the size of the largest tree created by removing \btv.  Let $\btv^*$ be a vertex that minimizes the value of $\phi$, i.e. $\btv^*$ is a vertex such that $\phi(\btv^*) \le \phi(\btv)$ for all other vertices $\btv$. Then we want to prove that $\phi(\btv^*)\leq n/2$.  Prove this by contradiction.  (Hint: try to show that either the parent or one of the children will have smaller potential. If you're feeling stuck, try drawing some pictures!)
+  
+\begin{proof}
+Define $\phi, \btv, \btv^*$ as above. Assume for the sake of contradiction that $\phi(\btv^*) > n/2$. For any binary tree split this way, we create a parent subtree and two child subtrees. Let's say they have sizes $T, L, R$, where $T$ is the parent and $T + L + R + 1 = n$. Without loss of generality, we split this into two cases - $T \geq R, L$ and $L \geq R, T$ (as, R, L can be substituted without issue). \\
+
+Suppose $T \geq L, R$. Then we examine the parent node of $\btv^*$, which we call $\btv'$. The sizes of our three new subtrees when we remove $\btv'$ instead of $\btv^*$ are $T - A, L + R + 1, A - 1$, where $A$ represents some branch of $T$ that becomes most of its own child node. If we can show that all three new sizes are less than $T$, we have shown that our choice of $\btv^*$ was not optimal, which is a contradiction. Obviously, $T - A < T$. Next, note that $T + L + R + 1 = n \implies L + R + 1 < n/2, T$ (from the fact that $T > n/2$). Lastly, $A < T \implies A - 1 < T$. Therefore $\btv^*$ is not optimal, contradiction. \\
+
+Now suppose $L \geq T, R$. Then we examine the left and right children of $L$ and call the one with a larger size $\btv'$. Now removing node $\btv'$ yields subtrees of size $T + R + 1, A, L - A - 1$. Clearly $A, L - A - 1 < L$, so now we check $T + R + 1$. If $L > n/2$, then we require $T + R + 1 < n/2$; therefore, $T + R + 1 < L$. Therefore, this is another contradiction. \\
+
+Our cases being exhausted, we conclude that $\phi(\btv^*) \leq n/2$.
+\end{proof}
  
  \item (from proofs to algorithms)  Turn your proof from Part~\ref{part:contradiction} into a Python program that given a root vertex \texttt{r} of a {\em size-augmented} tree \treeT\ with $n$ vertices finds a vertex \btv\ with $\phi(\btv)\leq n/2$. Your program should run in time $O(h)$ on all size-augmented trees of height $h$; again informally justify why your program has such a runtime. (Hint: try to repeatedly reduce the potential function by moving to children. Why don't we need to try moving to parents as in the previous proof?)
+ 
+\begin{proof}[Solution]
+We traverse each height-row at most once (because we only move downwards in our algorithm). However, we do not know how far down the tree we must go; it could be up to $h/2$ rows. Therefore we conclude that our program runs on $O(h)$ time.
+\end{proof}
+ 
  \end{enumerate}
  
  \newcommand{\incomp}{\mathit{incomp}}
@@ -145,9 +164,53 @@ then calling \texttt{calculate\_sizes(T.root)} should modify  \treeT\ to be the 
 \item Show that $f(1)=0$, $f(2)=1$, and for all $n\geq 3$, we have
  $$ f(n) = (n-1)\cdot (f(n-1)+f(n-2)).$$
  (Hint: let $d$ be one of the donors, and consider all possible patients $p$ with whom $d$ could be matched.  Then consider cases according to whether $\incomp(p)$ is matched with $\incomp(d)$ or not.)
+ 
+\begin{proof}
+This problem is isomorphic to that of counting derangements. Accordingly, I use similar reasoning. Suppose donor $d$ matches with patient $p$. There are $n - 1$ options for $p$ (because 1 of the patients is incompatible with $d$). Now we examine two cases: either $\incomp(d)$ matches with $\incomp(p)$ or $\incomp(d)$ does not match with $\incomp(p)$. In the first case, we need to match $n - 2$ patients with $n - 2$ donors, where each patient is incompatible with one donor. This is just $f(n - 2)$. \\
+
+Next, we examine the second case - in this instance, there is one patient every remaining donor cannot match with - for every non-$\incomp(p)$ donor, that is their corresponding incompatible patient, and for the $\incomp(p)$ donor, it is $\incomp(d)$. Therefore this is $f(n - 1)$. We can see that for any choice of $p$, there are $f(n - 1) + f(n - 2)$ ways to proceed; therefore, given that we have $n - 1$ ways to choose $p$, we find
+
+$$
+f(n) = (n-1)\cdot (f(n-1)+f(n-2)),
+$$
+
+which is what we desired.
+
+\end{proof}
 
  \item Prove by strong induction that for all $n\geq 2$, we have
  $$\frac{n!}{3} \leq f(n) \leq \frac{n!}{2}.$$
+
+ \begin{proof}
+First, at $n = 2$, we have 
+
+$$
+\frac{2!}{3} 1 \leq \frac{2!}{2},
+$$
+
+which is true. For $n = 3$, we calculate
+
+$$
+f(3) = 2 \cdot (1 + 0) = 2 \implies
+\frac{3!}{3} \leq 2 \leq \frac{3!}{2},
+$$
+which is also true. Because our recursion only uses $n - 1$ and $n - 2$ terms, we can proceed to the inductive steps.
+
+We begin with the first inequality. Assume $\frac{n!}{3} \leq f(n)$. Then we see that 
+
+$$
+f(n + 1) = n \cdot (f (n) + f(n - 1)) = n f(n) + n f(n - 1) \geq
+n \cdot \frac{n!}{3} + n \cdot \frac{(n - 1)!}{3} = \frac{(n + 1)!}{3},
+$$
+as desired. With the second inequality, we assume $\frac{n!}{2} \geq f(n)$. Then
+
+$$
+f(n + 1) = n f(n) + f(n - 1) \leq n \cdot \frac{n!}{2} + n \cdot \frac{(n - 1)!}{2} = \frac{(n + 1)!}{2},
+$$
+
+which is the other part we need. So we are done.
+ \end{proof}
+ 
  \end{enumerate}
 
 \end{enumerate}
