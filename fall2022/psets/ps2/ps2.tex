@@ -73,14 +73,14 @@ As discussed above, our algorithm can be reduced to a sorting algorithm where th
         \item Let $\Pi$ and $\Gamma$ be arbitrary computational problems, and suppose that there is a reduction from $\Pi$ to $\Gamma$ that runs in time at most $g(n)$ and makes at most $k(n)$ oracle calls, all on instances of size at most $f(n)$.  Show that if $\Gamma$ can be solved in time at most $T(n)$, then $\Pi$ can be solved in time at most $O(g(n)+k(n)\cdot T(f(n)))$. Note that the case $k(n)=1$ was stated and proved in class; the case $k(n)>1$ is useful as well, such as in Part (d) below.
         
 \begin{proof}
-There is not much to show here, to be honest. We accept that $\Pi$ can be solved by an algorithm with runtime $g(n)$ which makes $k(n)$ oracle calls. Then the overall runtime is just the greater of $O(g(n))$ and $O(k(n) \cdot T(f(n)))$. This is easily expressed as just $O(g(n)) + k(n) \cdot T(f(n)))$.
+There is not much to show here, to be honest. We accept that $\Pi$ can be solved by an algorithm with runtime $g(n)$ which makes $k(n)$ oracle calls, each of which has runtime $T(f(n))$ for an input of size $f(n)$. Then the overall runtime is just the greater of $O(g(n))$ and $O(k(n) \cdot T(f(n)))$. This is easily expressed as just $O(g(n)) + k(n) \cdot T(f(n)))$. The crucial idea here is that if $k(n)$ is a constant or small factor, we can call the oracle several times and not experience much loss in our runtime compared with other algorithms.
 \end{proof}
         
         \item (*challenge; extra credit) Come up with a way to avoid conversion to polar coordinates and any other trigonometric functions in solving AreaOfConvexPolygon in time $O(n\log n)$.  Specifically, design an $O(n)$-time reduction that makes $O(1)$ calls to a Sorting oracle on arrays of length at most $n$, using only arithmetic operations $+$, $-$, $\times$, $\div$, and $\sqrt{\hspace{1em}}$, along with comparators like $<$ and $==$.  (Hint: first partition the input points according to which quadrant they belong in, and consider $\tan\theta$ for a point with polar coordinates $(r,\theta)$.) 
         \end{enumerate}
 
 \begin{proof}
-The idea here is straightforward - use a series of if statements to sort our points $(x_i, y_i)$ by quadrant; this is easily doable in $O(1)$ time by requiring $x_i, y_i$ to have some greater or lesser relationship to 0. In particular, we can require points in Quadrant I to have $x_i \geq 0, y_i > 0$, Quadrant II to have $x_i < 0, y_i \geq 0$, Quadrant III with $x_i \leq 0, y_i < 0$ and Quadrant IV with $x_i > 0, y_i \leq 0$. Then - taking care to consider the $y = 0$ case - we compute the slope of the line from each point through the origin, and sort by axis on this parameter.
+The idea here is straightforward - use a series of if statements to sort our points $(x_i, y_i)$ by quadrant; this is easily doable in $O(1)$ time by requiring $x_i, y_i$ to have some greater or lesser relationship to 0. In particular, we can require points in Quadrant I to have $x_i \geq 0, y_i > 0$, Quadrant II to have $x_i < 0, y_i \geq 0$, Quadrant III with $x_i \leq 0, y_i < 0$ and Quadrant IV with $x_i > 0, y_i \leq 0$. Then - taking care to consider the $y = 0$ case - we compute the slope of the line from each point through the origin, and sort by axis on this parameter. This again is an $O(1)$ algorithm done $n$ times. At this point, we have every single point sorted within their quadrants by what would be $\theta$ if we were in polar coordinates. Combining the four quadrants back into one list - all of this is still on $O(n)$ time - we are ready to apply the area formulas from above. We can use the Euclidean distance formula to find each $c_i$ and compute areas with Heron's formula, which completes the idea. Therefore this is an $O(n)$ reduction which makes $O(1)$ (in particular, 4) calls to the Sorting oracle on arrays of length less than $n$.
 \end{proof}
     
     Similar techniques to what you are using in this problem are used in algorithms for other important geometric problems, like finding the Convex Hull of a set of points, which has applications in graphics and machine learning.
@@ -97,25 +97,34 @@ The idea here is straightforward - use a series of if statements to sort our poi
     
     \begin{enumerate}
         \item In the Github repository, we have given you a Python implementation of size-augmented BSTs supporting search, insertion, and selection, and with a stub for \texttt{rotate}. One of the implemented functions (\texttt{search}, \texttt{insert}, or \texttt{select}) has a correctness error, and another one is too slow (running in time linear in the number of nodes of the tree rather than in the height of tree). Identify and correct these errors. You should provide a text explanation of the errors and your corrections, as well as implement the corrections in Python.
+
+\begin{proof}
+The function incorrectly implemented was \texttt{select}. Whenever we travel right on a BST, we must keep in mind that any entry on the right of a node is always larger than every element on the left of the node. Therefore, every time the $\texttt{select}$ algorithm travels right on the tree, it should reduce the index it's looking for by the size of the left subtree plus one for the size of the parent node; this way we are searching for the appropriately large node in our new subtree. Originally, the recursive call did not decrease the index asked for on the right side of any tree - by decreasing the index the prescribed amount, all test cases came out correctly.
+
+The function implemented inefficiently was \texttt{insert}. Originally, the algorithm recalculated the sizes of every single node; however, this is unnecessary as we only need to compute the new sizes for parents of the inserted node. Luckily, there is only one of these per row in the tree, which means that we can do this in $O(h)$ time rather than $O(n)$ if we are smart. In particular, the way to do this is to add one to the size measurement of every node that we encounter before we have to return the node for the recursive algorithm to work; since we only encounter $O(h)$ nodes in our algorithm, this is a faster way to solve the problem.
+\end{proof}
         
         \item Describe (in pseudocode or pictures) how to extend \texttt{rotate} to size-augmented BSTs, and argue that your extension maintains the runtime $O(1)$. Prove that your new rotation operation preserves the invariant of correct size-augmentations. (That is, if every node's size attribute had the correct subtree size before the operation, then the same is true after the operation.)
 
 \begin{algorithm}[H]
 \text{rotate} \{$tree, direction, child\_side$\}\\
-\Input{A BST, the way that we want to rotate, and the child of the BST we rotate on}
+\Input{A BST, the way that we want to rotate, \\
+and the child of the BST we rotate on}
 \Output{The rotated BST}
 $antidirection = \text{Reverse}(direction)$ \\
 $pivot\_node = tree.child\_side$ \\
 $top\_node = pivot\_node.antidirection$ \\
-\If{top\_node.direction == \text{None}} {
-$pivot\_node.antidirection = \text{None}$ \\
-$top\_node.direction = pivot\_node$ }
-\Else{
 $pivot\_node.antidirection = top\_node.direction$ \\
-$top\_node.direction = pivot\_node$}
+$top\_node.direction = pivot\_node$ \\
+$top\_node.size = pivot\_node.size$ \\
+$pivot\_node.size -= (top\_node.antidirection.size + 1)$ \\
 $tree.child\_side = top\_node$ \\
 \Return{\textit{tree}}
 \end{algorithm}
+
+The pseudocode above works in $O(1)$. In fact, we can be sure about this because it entirely consists of BST operations - naming a child or a size - and assignment. The BST operations are all just moving up or down a list of pointers, so we can be sure that this is $O(1)$, and we covered that assignment is a basic operation in class. This happens a set number of times - in 8 lines, here - so we are in $O(1)$ time.
+
+The size-augmentations are all correct here as well. Note that every single node in a rotated BST keeps its same children except the ones denoted $pivot\_node$ and $top\_node$ (as no other node has its children replaced in the pseudocode above). So we need only examine these two to be sure that all nodes have the correct sizes. $top\_node$ goes where $pivot\_node$ was, and nothing is deleted from the tree; this means that $top\_node$ should have the same size as $pivot\_node$ originally did. Then $pivot\_node$ loses the child that wasn't rotated to $top\_node$; also, $top\_node$ is no longer a child of $pivot\_node$ (though it loses no children besides those two classes). Therefore we must remove the size measurement of $pivot\_node$'s unrotated child and subtract one for $top\_node$ (and of course, we note the case where $pivot\_node$ had no unrotated child and we just subtract 1). Therefore our size-augmentation is correct as long as the original measurement was correct.
         
         \item Implement \texttt{rotate} in size-augmented BSTs in Python in the stub we have given you.
     

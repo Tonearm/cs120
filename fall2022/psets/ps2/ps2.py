@@ -103,7 +103,6 @@ class BinarySearchTree:
                 self.right = BinarySearchTree(self.debugger)
             self._size += 1
             self.right.insert(key)
-        print(self.key, self._size)
         return self
 
     
@@ -139,21 +138,23 @@ class BinarySearchTree:
             
         if direction == "L":
             newTop = pivot.right
-            if newTop.left is None:
-                pivot.right = None
-                newTop.left = pivot
+            pivot.right = newTop.left
+            newTop.left = pivot
+            newTop._size = pivot._size
+            if newTop.right is not None:
+                pivot._size -= (newTop.right._size + 1)
             else:
-                pivot.right = newTop.left
-                newTop.left = pivot
+                pivot._size -= 1
         
         elif direction == "R":
             newTop = pivot.left
-            if newTop.right is None:
-                pivot.left = None
-                newTop.right = pivot
+            pivot.left = newTop.right
+            newTop.right = pivot
+            newTop._size = pivot._size
+            if newTop.left is not None:
+                pivot._size -= (newTop.left._size + 1)
             else:
-                pivot.left = newTop.right
-                newTop.right = pivot
+                pivot._size -= 1
             
         if child_side == "R":
             self.right = newTop
