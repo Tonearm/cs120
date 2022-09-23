@@ -40,13 +40,48 @@ policy, grading scale, revisions, and late days.
             \item The area of a triangle is $A = \sqrt{s(s-a)(s-b)(s-c)}$ where $a, b, c$ are the side lengths of the triangle and $s = \frac{a + b + c}{2}$ (\href{https://en.wikipedia.org/wiki/Heron\%27s_formula}{Heron's Formula}).
         \end{itemize}
         
-        \item Deduce that AreaOfConvexPolygon can be solved in time $O(n\log n)$.
+\begin{proof}
+We can solve the problem with the following pseudocode:
 
+\begin{algorithm}[H]
+\text{AreaOfConvexPolygon} \{$A$\}\\
+\Input{A set of coordinates $A = \{ (x_0, y_0), \dots, (x_{n - 1}, y_{n - 1} ) \}$ in any order}
+\Output{The area of the convex polygon formed by $A$}
+%$b=\min\{n,U\}$\;
+\ForEach{$i=0,\ldots,n-1$}{
+    $A'_i = \text{PolarCoordinates}(x_i, y_i)$}
+$A' = \text{Sort}(A')$; \\
+\ForEach{$i=0,\ldots,n-2$}{
+    $c = \text{LawOfCosines}(A'_i, A'_{i + 1})$ \\
+    $\text{TotalArea} \pluseq \text{HeronsFormula}(A'_i, A'_{i + 1}, c)$}
+$\text{TotalArea} \pluseq \text{HeronsFormula}(A'_0, A'_{n - 1}, \text{LawOfCosines}(A'_i, A'_{i + 1}))$ \\
+\Return{\textit{TotalArea}}
+\end{algorithm}
 
-        \item Let $\Pi$ and $\Gamma$ be arbitrary computational problems, and suppose that there is a reduction from $\Pi$ to $\Gamma$ that runs in time at most $g(n)$ and makes at most $k(n)$ oracle calls, all on instances of size at most $f(n)$.  Show that if $\Gamma$ can be solved in time at most $T(n)$, then $\Pi$ can be solved in time at most $O(g(n)+k(n)\cdot T(f(n)))$. Note that the case $k(n)=1$ was stated and proved in class; the case $k(n)>1$ is useful as well, such as in Part~\ref{part:nopolar} below. 
+Here, we sort based on the $\theta$ values of each polar coordinate, so that the closest angle to $0$ is first and the closest angle to $2\pi$ is last; this ensures that when we compute areas, we never overlap. Once we do this, we can find the three side lengths of every triangle formed with two vertices being adjacent in our sort and one value being the origin. The side lengths end up being $r_i, r_{i + 1}$ from the list of coordinates, and a third side which can be calculated by the Law of Cosines; then, we can use Heron's formula to find the area of each triangle. (To be honest, this isn't even necessary - we could just use the area formula $\frac{1}{2} ab \sin C$, where $C$ is the positive difference between the angle measures $\theta$. But I wanted to use the framework provided here.) When we add up all these values, we get the total area.
+
+This algorithm ends up being correct because a convex polygon is fully divided by applying lines radiating out from an interior point to every vertex, and we account for every triangle formed here (because lines don't intersect, we clearly form $n$ triangles, and note there are $n$ leftmost vertices that we measure). Now note that every step besides the sort happens in constant time - the conversion to polar coordinates is guaranteed to be $O(1)$, computation of the Law of Cosines and then Heron's formula all come from basic arithmetic operations, and then we just add all our results. So across $n$ sets of coordinates, that all turns out to be $O(n)$, which means that the sort is what dominates our overall runtime.
+\end{proof}
         
-        \item (*challenge; extra credit) Come up with a way to avoid conversion to polar coordinates and any other trigonometric functions in solving AreaOfConvexPolygon in time $O(n\log n)$.  Specifically, design an $O(n)$-time reduction that makes $O(1)$ calls to a Sorting oracle on arrays of length at most $n$, using only arithmetic operations $+$, $-$, $\times$, $\div$, and $\sqrt{\hspace{1em}}$, along with comparators like $<$ and $==$.  (Hint: first partition the input points according to which quadrant they belong in, and consider $\tan\theta$ for a point with polar coordinates $(r,\theta)$.) \label{part:nopolar}
+        \item Deduce that AreaOfConvexPolygon can be solved in time $O(n\log n)$.
+        
+\begin{proof}
+As discussed above, our algorithm can be reduced to a sorting algorithm where that algorithm is bounded by time $O(n)$ for other arithmetic operations. We know that \MergeSort runs in time $O (n \log n)$, so that works; the algorithm can be solved in time $O(n \log n)$.
+\end{proof}
+
+
+        \item Let $\Pi$ and $\Gamma$ be arbitrary computational problems, and suppose that there is a reduction from $\Pi$ to $\Gamma$ that runs in time at most $g(n)$ and makes at most $k(n)$ oracle calls, all on instances of size at most $f(n)$.  Show that if $\Gamma$ can be solved in time at most $T(n)$, then $\Pi$ can be solved in time at most $O(g(n)+k(n)\cdot T(f(n)))$. Note that the case $k(n)=1$ was stated and proved in class; the case $k(n)>1$ is useful as well, such as in Part (d) below.
+        
+\begin{proof}
+There is not much to show here, to be honest. We accept that $\Pi$ can be solved by an algorithm with runtime $g(n)$ which makes $k(n)$ oracle calls. Then the overall runtime is just the greater of $O(g(n))$ and $O(k(n) \cdot T(f(n)))$. This is easily expressed as just $O(g(n)) + k(n) \cdot T(f(n)))$.
+\end{proof}
+        
+        \item (*challenge; extra credit) Come up with a way to avoid conversion to polar coordinates and any other trigonometric functions in solving AreaOfConvexPolygon in time $O(n\log n)$.  Specifically, design an $O(n)$-time reduction that makes $O(1)$ calls to a Sorting oracle on arrays of length at most $n$, using only arithmetic operations $+$, $-$, $\times$, $\div$, and $\sqrt{\hspace{1em}}$, along with comparators like $<$ and $==$.  (Hint: first partition the input points according to which quadrant they belong in, and consider $\tan\theta$ for a point with polar coordinates $(r,\theta)$.) 
         \end{enumerate}
+
+\begin{proof}
+The idea here is straightforward - use a series of if statements to sort our points $(x_i, y_i)$ by quadrant; this is easily doable in $O(1)$ time by requiring $x_i, y_i$ to have some greater or lesser relationship to 0. In particular, we can require points in Quadrant I to have $x_i \geq 0, y_i > 0$, Quadrant II to have $x_i < 0, y_i \geq 0$, Quadrant III with $x_i \leq 0, y_i < 0$ and Quadrant IV with $x_i > 0, y_i \leq 0$. Then - taking care to consider the $y = 0$ case - we compute the slope of the line from each point through the origin, and sort by axis on this parameter.
+\end{proof}
     
     Similar techniques to what you are using in this problem are used in algorithms for other important geometric problems, like finding the Convex Hull of a set of points, which has applications in graphics and machine learning.
     
@@ -64,6 +99,23 @@ policy, grading scale, revisions, and late days.
         \item In the Github repository, we have given you a Python implementation of size-augmented BSTs supporting search, insertion, and selection, and with a stub for \texttt{rotate}. One of the implemented functions (\texttt{search}, \texttt{insert}, or \texttt{select}) has a correctness error, and another one is too slow (running in time linear in the number of nodes of the tree rather than in the height of tree). Identify and correct these errors. You should provide a text explanation of the errors and your corrections, as well as implement the corrections in Python.
         
         \item Describe (in pseudocode or pictures) how to extend \texttt{rotate} to size-augmented BSTs, and argue that your extension maintains the runtime $O(1)$. Prove that your new rotation operation preserves the invariant of correct size-augmentations. (That is, if every node's size attribute had the correct subtree size before the operation, then the same is true after the operation.)
+
+\begin{algorithm}[H]
+\text{rotate} \{$tree, direction, child\_side$\}\\
+\Input{A BST, the way that we want to rotate, and the child of the BST we rotate on}
+\Output{The rotated BST}
+$antidirection = \text{Reverse}(direction)$ \\
+$pivot\_node = tree.child\_side$ \\
+$top\_node = pivot\_node.antidirection$ \\
+\If{top\_node.direction == \text{None}} {
+$pivot\_node.antidirection = \text{None}$ \\
+$top\_node.direction = pivot\_node$ }
+\Else{
+$pivot\_node.antidirection = top\_node.direction$ \\
+$top\_node.direction = pivot\_node$}
+$tree.child\_side = top\_node$ \\
+\Return{\textit{tree}}
+\end{algorithm}
         
         \item Implement \texttt{rotate} in size-augmented BSTs in Python in the stub we have given you.
     

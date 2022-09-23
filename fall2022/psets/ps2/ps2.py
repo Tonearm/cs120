@@ -61,7 +61,7 @@ class BinarySearchTree:
         if left_size > ind and self.left is not None:
             return self.left.select(ind)
         if left_size < ind and self.right is not None:
-            return self.right.select(ind)
+            return self.right.select(ind - left_size - 1)
         return None
 
 
@@ -88,18 +88,22 @@ class BinarySearchTree:
     
     returns the original (top level) tree - allows for easy chaining in tests
     '''
+    
     def insert(self, key):
         if self.key is None:
             self.key = key
+            self._size = 1
         elif self.key > key: 
             if self.left is None:
                 self.left = BinarySearchTree(self.debugger)
+            self._size += 1
             self.left.insert(key)
         elif self.key < key:
             if self.right is None:
                 self.right = BinarySearchTree(self.debugger)
+            self._size += 1
             self.right.insert(key)
-        self.calculate_sizes()
+        print(self.key, self._size)
         return self
 
     
@@ -127,7 +131,35 @@ class BinarySearchTree:
        11 
     '''
     def rotate(self, direction, child_side):
-        # Your code goes here
+        
+        if child_side == "R":
+            pivot = self.right
+        elif child_side == "L":
+            pivot = self.left
+            
+        if direction == "L":
+            newTop = pivot.right
+            if newTop.left is None:
+                pivot.right = None
+                newTop.left = pivot
+            else:
+                pivot.right = newTop.left
+                newTop.left = pivot
+        
+        elif direction == "R":
+            newTop = pivot.left
+            if newTop.right is None:
+                pivot.left = None
+                newTop.right = pivot
+            else:
+                pivot.left = newTop.right
+                newTop.right = pivot
+            
+        if child_side == "R":
+            self.right = newTop
+        elif child_side == "L":
+            self.left = newTop
+            
         return self
 
     def print_bst(self):
