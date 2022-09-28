@@ -34,7 +34,10 @@ prog1 = [8,
     ['assign', eleven_id, 11],
     ['assign', output_len_id, 1], 
     ['assign', output_ptr_id, 0],
-    # TODO: lines 5-8 from pseudocode
+    ['assign', result_id, 11],
+    ['read', counter_id, zero_id],
+    ['goto', counter_id, 11],
+    ['*', result_id, result_id, result_id],
     ['-', counter_id, counter_id, one_id],
     ['goto', zero_id, 7],
     ['*', result_id, result_id, eleven_id],
@@ -57,7 +60,12 @@ prog2 = [10,
     ['*', temp_id, temp_id, W_id],
     ['-', result_id, result_id, temp_id],
     ['-', counter_id, counter_id, one_id],
-    # TODO: lines 14-19 from pseudocode
+    ['goto', zero_id, 8],
+    ['*', result_id, result_id, eleven_id],
+    ['/', temp_id, result_id, W_id],
+    ['*', temp_id, temp_id, W_id],
+    ['-', result_id, result_id, temp_id],
+    ['write', output_ptr_id, result_id]
 ]
 
 
@@ -66,10 +74,14 @@ prog2 = [10,
 
 # Time a function call on a given input
 def time_fun (fn, input):
-    start_time = time.time()
-    fn(input)
-    end_time = time.time()
-    return end_time - start_time
+    temp_sum = 0
+    trials = 1
+    for _ in range (trials):
+        start_time = time.time()
+        fn(input)
+        end_time = time.time()
+        temp_sum += end_time - start_time
+    return temp_sum/trials
 
 def run_prog1 (n):
     return simulator.executeProgram(prog1, [n])[0]
@@ -79,11 +91,11 @@ def run_prog2 (n):
 
 # Plot both RAM programs' running times and save as `running_times.png`
 def graph ():
-    input_range = range(0, 15)
+    input_range = range(0, 26)
     prog1_time = [time_fun(run_prog1, i) for i in input_range]
-    prog2_time = [time_fun(run_prog2, i) for i in input_range]
+    #prog2_time = [time_fun(run_prog2, i) for i in input_range]
     plt.plot(input_range, prog1_time, label="Program 1")
-    plt.plot(input_range, prog2_time, label="Program 2")
+    #plt.plot(input_range, prog2_time, label="Program 2")
     plt.xlabel('Input')
     plt.ylabel('Running Time (in seconds)')
     plt.legend()

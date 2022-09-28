@@ -36,7 +36,7 @@ def executeProgram(programArr, inputArr):
         ops = programArr[programCounter][1:]
         
         # Assignment commands
-        if cmd == "read":       
+        if cmd == "read":
             # ['read', i, j]: lookup the var_j location in memory and assign that value to var_i                    
             variableList[ops[0]] = memory[variableList[ops[1]]]
         if cmd == "write":
@@ -44,33 +44,40 @@ def executeProgram(programArr, inputArr):
             memory[variableList[ops[0]]] = variableList[ops[1]]
         if cmd == "assign":
             # ['assign', i, j]: assign var_i to the value j
-            # TODO: Implement assign.
+            variableList[ops[0]] = ops[1]
             pass
             
         # Arithmetic commands
         if cmd == "+":
             # ['+', i, j, k]: compute (var_j + var_k) and store in var_i
-            # TODO: Implement addition.
+            variableList[ops[0]] = variableList[ops[1]] + variableList[ops[2]]
             pass
         if cmd == "-":
             # ['-', i, j, k]: compute max((var_j - var_k), 0) and store in var_i.
-            # TODO: Implement subtraction.
+            if variableList[ops[1]] - variableList[ops[2]] > 0:
+                variableList[ops[0]] = variableList[ops[1]] - variableList[ops[2]]
+            else:
+                variableList[ops[0]] = 0
             pass
         if cmd == "*":
             # ['*', i, j, k]: compute (var_j * var_k) and store in var_i.
-            # TODO: Implement multiplication.
+            variableList[ops[0]] = variableList[ops[1]] * variableList[ops[2]]
             pass
         if cmd == "/":
             #  ['/', i, j, k]: compute (var_j // var_k) and store in var_i.
             # Note that this is integer division. You should return an integer, not a float.
             # Remember division by 0 results in 0.
-            # TODO: Implement division.
+            if variableList[ops[2]] == 0:
+                variableList[ops[0]] = 0
+            else:
+                variableList[ops[0]] = variableList[ops[1]] // variableList[ops[2]]
             pass
             
         # Control commands
         if cmd == "goto":
             # ['goto', i, j]: if var_i is equal to 0, go to line j
-            # TODO: Implement goto.
+            if variableList[ops[0]] == 0:
+                programCounter = ops[1] - 1
             pass
         
         programCounter += 1

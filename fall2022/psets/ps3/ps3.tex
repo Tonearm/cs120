@@ -44,10 +44,10 @@ $\outputpointer = 0$\;
 $\result = 11$\;
 $\counter = M[\zero]$\;
 \Indp
- IF $\counter == 0$ GOTO \ref{line:done}\; \label{line:loop}
+ IF $\counter == 0$ GOTO 11\;
 $\result = \result * \result$\;
 $\counter = \counter - \one$\;
-IF $\zero == 0$ GOTO \ref{line:loop}\;
+IF $\zero == 0$ GOTO 7\;
 \Indm
 $\result = \result * \eleven$\; \label{line:done}
 $M[\outputpointer]=\result$\;
@@ -68,13 +68,13 @@ $\result = 11$\;
 $\W = 2^{32}$\;
 $\counter = M[\zero]$\;
 \Indp
-IF $\counter == 0$ GOTO \ref{line:done2}\; \label{line:loop2}
+IF $\counter == 0$ GOTO 15 \;
 $\result = \result * \result$\;
 $\temp = \result / \W$\;
 $\temp = \temp \times \W$\;
 $\result = \result - \temp$\;
 $\counter = \counter - \one$\;
-IF $\zero == 0$ GOTO \ref{line:loop2}\;
+IF $\zero == 0$ GOTO 8 \;
 \Indm
 $\result = \result * \eleven$\;
 \label{line:done2}
@@ -86,10 +86,22 @@ $M[\outputpointer]=\result$\;
 
 
 \begin{enumerate}
-    \item Exactly calculate (without asymptotic notation) the RAM-model running times of the above algorithms as a function of $N$.
-    Which one is faster? \label{itm:RAMtime}
+    \item \label{itm:RAMtime} Exactly calculate (without asymptotic notation) the RAM-model running times of the above algorithms as a function of $N$.
+    Which one is faster? 
+
+\begin{proof}
+
+\end{proof}
     
-    \item Using your RAM Simulator, run both RAM programs on inputs $N=0,1,2,\ldots,15$ and graph the actual running times (in clock time, not RAM steps).  (We have provided you with some timing and graphing code in the Github repository.) Which one is faster?  \label{itm:realtime}  
+    \item \label{itm:realtime} Using your RAM Simulator, run both RAM programs on inputs $N=0,1,2,\ldots,15$ and graph the actual running times (in clock time, not RAM steps).  (We have provided you with some timing and graphing code in the Github repository.) Which one is faster? 
+    
+\begin{proof}[Solution]
+Here is the plot.
+\\
+\includegraphics[width=5in]{2-2}
+
+It looks like the first program is slightly faster until $N = 12$, at which point it becomes dramatically slower than the second program.
+\end{proof}  
     
     \item Explain the discrepancies you see between Parts~\ref{itm:RAMtime} and \ref{itm:realtime}.  (Hint: What do we know about the relationship between the RAM and Word-RAM models, and why is it relevant to how efficiently the Python simulation runs?)  
     
