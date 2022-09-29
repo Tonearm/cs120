@@ -75,7 +75,7 @@ prog2 = [10,
 # Time a function call on a given input
 def time_fun (fn, input):
     temp_sum = 0
-    trials = 1
+    trials = 30
     for _ in range (trials):
         start_time = time.time()
         fn(input)
@@ -91,11 +91,11 @@ def run_prog2 (n):
 
 # Plot both RAM programs' running times and save as `running_times.png`
 def graph ():
-    input_range = range(0, 26)
-    prog1_time = [time_fun(run_prog1, i) for i in input_range]
-    #prog2_time = [time_fun(run_prog2, i) for i in input_range]
-    plt.plot(input_range, prog1_time, label="Program 1")
-    #plt.plot(input_range, prog2_time, label="Program 2")
+    input_range = range(0, 300)
+    #prog1_time = [time_fun(run_prog1, i) for i in input_range]
+    prog2_time = [time_fun(run_prog2, i) for i in input_range]
+    #plt.plot(input_range, prog1_time, label="Program 1")
+    plt.plot(input_range, prog2_time, label="Program 2")
     plt.xlabel('Input')
     plt.ylabel('Running Time (in seconds)')
     plt.legend()
