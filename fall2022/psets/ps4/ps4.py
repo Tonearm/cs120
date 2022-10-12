@@ -72,8 +72,8 @@ def experiments():
     # Feel free to edit these initial parameters
 
     RUNS = 20  # Number of runs for each trial; more runs means better distributions approximation but longer experiment
-    HEIGHT = 1.5  # Width of a chart
-    WIDTH = 3  # Height of a chart
+    HEIGHT = 1.5  # Height of a chart
+    WIDTH = 3   # Width of a chart
     # Determines if subcharts share the same axis scale/limits
     # ... since the trails cover a wide range, sharing the same scale/limits can cause some lines to be too small.
     SAME_AXIS_SCALE = False
@@ -81,8 +81,8 @@ def experiments():
     # You do not need to edit anything below this line
     # ... however, you are free to investigate how it works
 
-    # The search space for our paramters
-    # DO NOT EDIT these paramters for your final figure
+    # The search space for our parameters
+    # DO NOT EDIT these parameters for your final figure
     n = [2 ** i for i in range(10, 16)]
     # Our deterministically generated dataset
     fixed_dataset = sorted([(0, K) for K in range(max(n))], key=lambda T: T[1], reverse=True)
