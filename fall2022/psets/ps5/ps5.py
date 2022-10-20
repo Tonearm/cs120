@@ -129,9 +129,41 @@ def bfs_2_coloring(G, precolored_nodes=None):
     
     # TODO: Complete this function by implementing two-coloring using the colors 0 and 1.
     # If there is no valid coloring, reset all the colors to None using G.reset_colors()
+
+    bfs_list = []
+    frontier = []
+    G_not_visited = [x for x in range (0, G.N) if x not in visited]
     
-    G.reset_colors()
-    return None
+    while (G_not_visited != []) or (frontier != []):
+        if frontier == []:
+            frontier.append(G_not_visited[0])
+            G_not_visited = G_not_visited[1:]
+
+        bfs_list.append(frontier[0])
+        for x in G.edges[frontier[0]]:
+            if x in G_not_visited:
+                frontier.append(x)
+                G_not_visited.remove(x)
+        frontier = frontier[1:]
+
+            
+    
+    for k in bfs_list:
+        for i in G.edges[k]:
+            if G.colors[i] != None and i not in visited:
+                G.colors[k] = 1 - G.colors[i]
+                break
+        if G.colors[k] == None:
+            G.colors[k] = 0
+            
+            
+    if not G.is_graph_coloring_valid():
+        G.reset_colors()
+        return None
+
+        
+    return G.colors
+
 
 '''
     Part B: Implement is_independent_set.
@@ -141,7 +173,14 @@ def bfs_2_coloring(G, precolored_nodes=None):
 # Checks if subset is an independent set in G 
 def is_independent_set(G, subset):
     # TODO: Complete this function
-
+    
+    
+    for i in subset:
+        for j in subset:
+            if j < i:
+                if i in G.edges[j]:
+                    return False
+    
     return True
 
 '''
@@ -169,9 +208,21 @@ def is_independent_set(G, subset):
 # If no coloring is possible, resets all of G's colors to None and returns None.
 def iset_bfs_3_coloring(G):
     # TODO: Complete this function.
-
+        
+    if G.N < 3:
+        return bfs_2_coloring(G)
+    
+    for k in range (1, (G.N)//3 + 1):
+        for coloring in combinations(range(0, G.N), k):
+            if is_independent_set(G, coloring):
+                G.colors = bfs_2_coloring(G, coloring)
+            if G.colors is not None:
+                return G.colors
+        
+        
     G.reset_colors()
     return None
+                
 
 # Feel free to add miscellaneous tests below!
 if __name__ == "__main__":
