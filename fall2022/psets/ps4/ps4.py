@@ -35,9 +35,67 @@ def QuickSelect(arr, i):
 
     # Feel free to use get_random_index(arr) or get_random_int(start_inclusive, end_inclusive)
     # ... see the helper functions below
-    pass
-    return (0, -1)
+    
+    ind = get_random_index(arr)
+    P = arr[ind][0]
+    A_less = []
+    A_more = [] 
+    A_same= []
+    
+    for item in arr:
+        if item[0] < P:
+            A_less.append(item)
+        elif item[0] > P:
+            A_more.append(item)
+        elif item[0] == P:
+            A_same.append(item)
+            
+    len_less = len(A_less)
+    len_same = len(A_same)
+    if i < len_less:
+        return QuickSelect(A_less, i)
+    elif i >= len_less + len_same:
+        return QuickSelect(A_more, i - len_less - len_same)
+    else:
+        return A_same[0]
 
+def QuickSelect3(arr, i):
+    # Your code here
+
+    # Feel free to use get_random_index(arr) or get_random_int(start_inclusive, end_inclusive)
+    # ... see the helper functions below
+    
+    i1 = get_random_index(arr)
+    i2 = get_random_index(arr)
+    i3 = get_random_index(arr)
+    if (((i1 >= i2) or (i1 >= i3)) and ((i1 <= i2) or (i1 <= i3))):
+        ind = i1
+    elif (((i2 >= i1) or (i2 >= i3)) and ((i2 <= i1) or (i2 <= i3))):
+        ind = i2
+    else:
+        ind = i3
+        
+    P = arr[ind][0]
+    A_less = []
+    A_more = [] 
+    A_same= []
+    
+    for item in arr:
+        if item[0] < P:
+            A_less.append(item)
+        elif item[0] > P:
+            A_more.append(item)
+        elif item[0] == P:
+            A_same.append(item)
+            
+    len_less = len(A_less)
+    len_same = len(A_same)
+    if i < len_less:
+        return QuickSelect3(A_less, i)
+    elif i >= len_less + len_same:
+        return QuickSelect3(A_more, i - len_less - len_same)
+    else:
+        return A_same[0]
 
 '''
 Uses MergeSort to resolve a number of queries where each query is to find an key-value pair (Kj, Vj) such that Kj is an i’th smallest key.
@@ -54,8 +112,15 @@ NOTE: This is different from the QuickSelect definition. This function takes in 
 def MergeSortSelect(arr, query_list):
     # Only call MergeSort once
     # ... MergeSort has already been implemented for you (see below)
-    pass
-    return [(0, -1)] * len(query_list)  # replace this line with your return
+    
+    srtd = MergeSort(arr)
+    
+    returnlst = []
+    
+    for i in query_list:
+        returnlst.append(srtd[i])
+        
+    return returnlst
 
 
 ##################################
@@ -67,7 +132,7 @@ def MergeSortSelect(arr, query_list):
 
 def experiments():
     # Edit this parameter
-    k = [1, 1, 1, 1, 1]
+    k = [16, 20, 24, 32, 36]
 
     # Feel free to edit these initial parameters
 
@@ -112,6 +177,20 @@ def experiments():
                 k_record.append(ki)
                 ms_record.append(seconds * 1000)  # Convert seconds to milliseconds
                 algorithm_record.append("QuickSelect")
+                
+            # QuickSelect3 Runs
+            for _ in range(RUNS):
+                # Record Time Taken to Solve All Queries
+                start_time = time.time()
+                for q in queries:
+                    # Copy dataset just to be safe
+                    QuickSelect3(dataset_size_n.copy(), q)
+                seconds = time.time() - start_time
+                # Record this trial run
+                n_record.append(ni)
+                k_record.append(ki)
+                ms_record.append(seconds * 1000)  # Convert seconds to milliseconds
+                algorithm_record.append("QuickSelect3")
 
             # MergeSort Runs
             for _ in range(RUNS):
