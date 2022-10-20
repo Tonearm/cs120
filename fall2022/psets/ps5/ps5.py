@@ -132,31 +132,34 @@ def bfs_2_coloring(G, precolored_nodes=None):
 
     bfs_list = []
     frontier = []
-    G_not_visited = [x for x in range (0, G.N) if x not in visited]
-    
-    while (G_not_visited != []) or (frontier != []):
+    G_not_visited = [1 if x not in visited else 0 for x in range (0, G.N)]
+    last = 0
+        
+    while last < G.N:
         if frontier == []:
-            frontier.append(G_not_visited[0])
-            G_not_visited = G_not_visited[1:]
+            if G_not_visited[last] == 1:
+                frontier.append(last)
+                G_not_visited[last] = 0
+            last += 1
 
-        bfs_list.append(frontier[0])
-        for x in G.edges[frontier[0]]:
-            if x in G_not_visited:
-                frontier.append(x)
-                G_not_visited.remove(x)
-        frontier = frontier[1:]
-
+        else:    
+            bfs_list.append(frontier[0])
+            for x in G.edges[frontier[0]]:
+                if G_not_visited[x] == 1:
+                    frontier.append(x)
+                    G_not_visited[x] = 0
+            frontier = frontier[1:] 
             
-    
+    G_not_visited = [1 if x not in visited else 0 for x in range (0, G.N)]
+                
     for k in bfs_list:
         for i in G.edges[k]:
-            if G.colors[i] != None and i not in visited:
+            if G.colors[i] != None and G_not_visited[i] == 1:
                 G.colors[k] = 1 - G.colors[i]
                 break
         if G.colors[k] == None:
             G.colors[k] = 0
-            
-            
+                      
     if not G.is_graph_coloring_valid():
         G.reset_colors()
         return None
