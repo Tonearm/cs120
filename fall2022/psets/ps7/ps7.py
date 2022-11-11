@@ -190,7 +190,14 @@ def iset_bfs_3_coloring(G):
 def sat_3_coloring(G):
     solver = Glucose3()
 
-    # TODO: Add the clauses to the solver
+    for n in range (G.N):
+        solver.add_clause([3 * n + 1, 3 * n + 2, 3 * n + 3])
+                
+    for m in range (len(G.edges)):
+        for n in G.edges[m]:
+            for i in range (1, 4):
+                solver.add_clause([- (3 * m + i), - (3 * n  + i)])
+        
 
     # Attempt to solve, return None if no solution possible
     if not solver.solve():
@@ -199,9 +206,15 @@ def sat_3_coloring(G):
 
     # Accesses the model in form [-v1, v2, -v3 ...], which denotes v1 = False, v2 = True, v3 = False, etc.
     solution = solver.get_model()
-
-    # TODO: If a solution is found, convert it into a coloring and update G.colors
-
+        
+    for m in range (len(G.colors)):
+        if solution[3*m] > 0:
+            G.colors[m] = 0
+        elif solution[3*m + 1] > 0:
+            G.colors[m] = 1
+        elif solution[3*m + 2] > 0:
+            G.colors[m] = 2
+    
     return G.colors
 
 
