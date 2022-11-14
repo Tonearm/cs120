@@ -48,61 +48,10 @@ def benchmark():
             ("ISET BFS Coloring", lambda g: iset_bfs_3_coloring(g)),
             ("SAT Coloring", lambda g: sat_3_coloring(g))]
 
-    print("Line of Rings")
-    print()
-    for r in [3,4,5]:
-        print("Size of ring", r)
-        for rings in range(subgraph_line_parameter_range[0], subgraph_line_parameter_range[1], subgraph_line_parameter_range[2]):
-            print("\tNumber of rings", rings)
-            g = generate_line_of_ring_subgraphs(Graph, rings, r)
-            size_text = "\t(n = {}, m = {})".format(g.N, sum([len(v_lst) for v_lst in g.edges]) // 2)
-            print(size_text)
-            for (alg_name, alg) in algs:
-                timedout = False
-                try:
-                    with timeout(seconds=TIMEOUT_LENGTH):
-                        alg(g.clone())
-                except TimeoutError:
-                    timedout = True
-                col = color.GREEN if not timedout else color.ORANGE
-                if timedout:
-                    symbol = color.BOLD + col + u'\u23f1' + color.END + color.END
-                else:
-                    symbol = color.BOLD + col + (u'\u2713' ) + color.END + color.END
-                print("\t\t" + symbol + "  " + alg_name + ": ", ("Timeout" if timedout else "Finished"))
-
-    print()
-    print()
-    print("Randomized Cluster Connections (Semi Independent Sets)")
-    print()
-    for q in range(cluster_graph_cluster_quantity_parameter_range[0], cluster_graph_cluster_quantity_parameter_range[1], cluster_graph_cluster_quantity_parameter_range[2]):
-        print("\tNumber of clusters", q)
-        for s in range(cluster_graph_cluster_size_parameter_range[0], cluster_graph_cluster_size_parameter_range[1], cluster_graph_cluster_size_parameter_range[2]):
-            # print()
-            print("\t\tSize of cluster", s)
-            g = generate_random_linked_cluster(Graph, s, q, 0.5)
-            size_text = "\t\t(n = {}, m = {})".format(g.N, sum([len(v_lst) for v_lst in g.edges]) // 2)
-            print(size_text)
-            for (alg_name, alg) in algs:
-                timedout = False
-                try:
-                    with timeout(seconds=TIMEOUT_LENGTH):
-                        alg(g.clone())
-                except TimeoutError:
-                    timedout = True
-                col = color.GREEN if not timedout else color.ORANGE
-                if timedout:
-                    symbol = color.BOLD + col + u'\u23f1' + color.END + color.END
-                else:
-                    symbol = color.BOLD + col + (u'\u2713' ) + color.END + color.END
-                print("\t\t\t" + symbol + "  " + alg_name + ": ", ("Timeout" if timedout else "Finished"))
-
-    print()
-    print()
 
     print("Hard instances")
     print()
-    n = [5000, 10000, 30000]
+    n = [2, 5, 10, 50, 100, 500, 1000, 5000, 10000, 30000]
     for i, g in enumerate(hard_graph_list):
         print(f"(n = " + str(n[i]) + ")")
         for (alg_name, alg) in algs:

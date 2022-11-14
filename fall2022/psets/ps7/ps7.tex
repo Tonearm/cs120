@@ -9,11 +9,11 @@
 
 \textbf{Your name: Andrew Courtney}
 
-\textbf{Collaborators: }
+\textbf{Collaborators: Felix Yeung}
 
-\textbf{No. of late days used on previous psets: }
+\textbf{No. of late days used on previous psets: 6}
 
-\textbf{No. of late days used after including this pset: }
+\textbf{No. of late days used after including this pset: 7}
 
 
 The purpose of this problem set is to develop skills in implementing graph algorithms, appreciate the impact of different kinds of worst-case exponential algorithms in practice, and practice reducing problems to SAT.
@@ -50,7 +50,7 @@ The purpose of this problem set is to develop skills in implementing graph algor
 
 \item 
 
-\item Running the code as described here, we can see that the SAT solver way outperforms the Exhaustive Search and ISET BFS algorithms.
+\item Running the code as described here, we can see that the SAT solver way outperforms the Exhaustive Search and ISET BFS algorithms. In particular, it destroyed the other solvers on the ring instances. This may be because in the exhaustive and ISET colorings, colorings which are ``next" to each other do not get any better - the strategy of working down a list of potential colorings which are very similar naively could take a really long time. However, the ring pattern is pretty ``predictable", so the SAT solver would work pretty quickly through the conditions and not try a bunch of different graphs. The cluster instances are more random, meaning that going through colorings in a list is plausibly more successful from a runtime point of view. In the hard instances, we see again that SAT is especially good - it only fails at $n = 30000$, while the other two algorithms fail even at $n = 5000$. It's clear at this point that ISET in some cases is not even much of an upgrade over exhaustive coloring, which is kind of hard to fathom, but reflects that in cases of large $n$, exponential time is still really slow.
 
 \end{enumerate}
 \end{proof}
